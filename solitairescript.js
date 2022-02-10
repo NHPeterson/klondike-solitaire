@@ -1,22 +1,6 @@
 "use strict";
 
-const deck = ['1S', '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', '10S', '11S', '12S', '13S',
-			'1H', '2H', '3H', '4H', '5H', '6H', '7H', '8H', '9H', '10H', '11H', '12H', '13H',
-			'1C', '2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', '10C', '11C', '12C', '13C',
-			'1D', '2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', '10D', '11D', '12D', '13D'];
 var stock = [];
-var waste = [];
-var f0 = [];
-var f1 = [];
-var f2 = [];
-var f3 = [];
-var t0 = [];
-var t1 = [];
-var t2 = [];
-var t3 = [];
-var t4 = [];
-var t5 = [];
-var t6 = [];
 
 window.onload = function() {
 	document.getElementById("play").onclick = createGame;
@@ -25,7 +9,10 @@ window.onload = function() {
 
 function createGame() {
 	// use the stock as the base for the shuffled deck
-	stock = deck.slice();
+	stock = ['1S', '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', '10S', '11S', '12S', '13S',
+	'1H', '2H', '3H', '4H', '5H', '6H', '7H', '8H', '9H', '10H', '11H', '12H', '13H',
+	'1C', '2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', '10C', '11C', '12C', '13C',
+	'1D', '2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', '10D', '11D', '12D', '13D'];
 	//for (var i = 0; i < deck.length; i++) { stock.push(deck[i]); }
 	for (var i = stock.length - 1; i > 0; i--) {
 		var j = Math.floor(Math.random() * i);
@@ -61,24 +48,23 @@ function createGame() {
 						break;
 					case 3:
 						gameCell.setAttribute("class", "foundation");
-						//gameCell.onclick = clickCard;
+						gameCell.addEventListener("click", clickFoundation);
 						break;
 					case 4:
 						gameCell.setAttribute("class", "foundation");
-						//gameCell.onclick = clickCard;
+						gameCell.addEventListener("click", clickFoundation);
 						break;
 					case 5:
 						gameCell.setAttribute("class", "foundation");
-						//gameCell.onclick = clickCard;
+						gameCell.addEventListener("click", clickFoundation);
 						break;
 					case 6:
 						gameCell.setAttribute("class", "foundation");
-						//gameCell.onclick = clickCard;
+						gameCell.addEventListener("click", clickFoundation);
 						break;
 				}
 			} else if (i === 1) {
 				gameCell.setAttribute("class", "back");
-				gameCell.onclick = clickCard;
 				gameCell.stack = stock.splice(0, j + 1);
 				var cardImg = document.createElement("img");
 				cardImg.onclick = clickCard;
@@ -86,7 +72,7 @@ function createGame() {
 				cardImg.setAttribute("alt", gameCell.stack[gameCell.stack.length - 1]);
 				gameCell.innerHTML = j;
 				if (j === 0) {
-					gameCell.setAttribute("class", "");
+					gameCell.setAttribute("class", "tableau");
 					gameCell.innerHTML = "";
 				}
 				gameCell.appendChild(cardImg);
@@ -98,19 +84,7 @@ function createGame() {
 function clickCard(e) {
 	if (e.target.getAttribute("id") === "selected") {
 		// if clicking on the already selected card, unselect it
-		e.target.setAttribute("id", "");
-	} else if (e.target.getAttribute("class") === "back" && !e.target.hasChildNodes()) {
-		if (e.target.stack.length === 1) {
-			e.target.innerHTML = "";
-			e.target.setAttribute("class", "");
-		} else {
-			e.target.innerHTML = e.target.stack.length -1;
-		}
-		var cardImg = document.createElement("img");
-		cardImg.onclick = clickCard;
-		cardImg.setAttribute("src", "images/" + e.target.stack[e.target.stack.length - 1] + ".jpg");
-		cardImg.setAttribute("alt", e.target.stack[e.target.stack.length - 1]);
-		e.target.appendChild(cardImg);
+		e.target.removeAttribute("id");
 	} else {
 		var lastCard = document.getElementById("selected");
 		if (lastCard) {
@@ -118,21 +92,32 @@ function clickCard(e) {
 			var lastStr = lastCard.getAttribute("alt");
 			var lastNum = parseInt(lastStr);
 			var lastSuit = lastStr.substr(-1);
-			var targetStr = "";
-			var targetNum = 14;
-			var targetSuit = "";
-			if (e.target.getAttribute("alt")) {
-				targetStr = e.target.getAttribute("alt");
-				targetNum = parseInt(targetStr);
-				targetSuit = targetStr.substr(-1);
-			}
+			var targetStr = e.target.getAttribute("alt");
+			var targetNum = parseInt(targetStr);
+			var targetSuit = targetStr.substr(-1);
+			//if (e.target.getAttribute("alt")) {
+			//	targetStr = e.target.getAttribute("alt");
+			//	targetNum = parseInt(targetStr);
+			//	targetSuit = targetStr.substr(-1);
+			//}
 			if ((e.target.parentNode.getAttribute("id") !== "wastecell")
 				&& (e.target.parentNode.getAttribute("class") !== "behind")
-				&& (lastNum === targetNum - 1)
 				&& (
-					((lastSuit === "S" || lastSuit === "C") && (targetSuit === "H" || targetSuit === "D"))
-					|| ((lastSuit === "H" || lastSuit === "D") && (targetSuit === "S" || targetSuit === "C"))
-				)
+					(
+						(lastNum === targetNum - 1)
+						&& (
+							((lastSuit === "S" || lastSuit === "C") && (targetSuit === "H" || targetSuit === "D"))
+							|| ((lastSuit === "H" || lastSuit === "D") && (targetSuit === "S" || targetSuit === "C"))
+							)
+					)
+					||
+					(
+						(e.target.parentNode.getAttribute("class") === "foundation")
+						&& (lastCard.parentNode.getAttribute("class") !== "behind")
+						&& (lastNum === targetNum + 1)
+						&& (lastSuit === targetSuit)
+					)
+					)
 				)
 			{
 				var lastCell = lastCard.parentNode;
@@ -144,16 +129,15 @@ function clickCard(e) {
 				var lastLength = lastCell.stack.length - lastIndex;
 				// move cards from last array to target array
 				targetCell.stack = targetCell.stack.concat(lastCell.stack.splice(lastIndex));
-				//for (var i = lastIndex; i < lastCell.stack.length; i++) {
-				//	targetCell.stack.push(lastCell.stack.pop());
-				//}
 				// rebuild the last cell
 				for (var i = 0; i < lastLength; i++) {
 					lastCell.removeChild(lastCell.lastChild);
 				}
-				if (lastCell.childNodes > 1
-					|| (lastCell.getAttribute("id") === "wastecell" && lastCell.stack.length > 0)) {
-					if (lastCell.getAttribute("id") !== "wastecell") {
+				if (lastCell.childElementCount > 0
+					|| (lastCell.getAttribute("id") === "wastecell" && lastCell.stack.length > 0)
+					|| (lastCell.getAttribute("class") === "foundation" && lastCell.stack.length > 0)) {
+					if (lastCell.getAttribute("id") !== "wastecell"
+					&& lastCell.getAttribute("class") !== "foundation") {
 						lastCell.removeChild(lastCell.lastChild);
 					}
 					var cardImg = document.createElement("img");
@@ -161,26 +145,45 @@ function clickCard(e) {
 					cardImg.setAttribute("src", "images/" + lastCell.stack[lastCell.stack.length - 1] + ".jpg");
 					cardImg.setAttribute("alt", lastCell.stack[lastCell.stack.length - 1]);
 					lastCell.appendChild(cardImg);
+				} else if (lastCell.getAttribute("class") === "foundation") {
+					lastCell.addEventListener("click", clickFoundation);
+				} else if (lastCell.getAttribute("class") === "back") {
+					lastCell.addEventListener("click", clickBack);
+				} else if (lastCell.getAttribute("class") === "tableau") {
+					lastCell.addEventListener("click", clickTableau);
 				}
 				// rebuild the target cell
-				targetCell.removeChild(targetCell.lastChild);
-				for (var i = targetCell.stack.length - lastLength - 1; i < targetCell.stack.length - 1; i++) {
-					var cardDiv = document.createElement("div");
-					cardDiv.setAttribute("class", "behind");
-					targetCell.appendChild(cardDiv);
+				if (targetCell.getAttribute("class") === "foundation") {
+					e.target.setAttribute("src", "images/" + targetCell.stack[targetCell.stack.length - 1] + ".jpg");
+					e.target.setAttribute("alt", targetCell.stack[targetCell.stack.length - 1]);
+					var allTab = document.querySelectorAll(".tableau");
+					var winState = 7;
+					for (var i = 0; i < allTab.length; i++) {
+						if (allTab[i].stack.length === 0) { winState -= 1; }
+					}
+					if (winState === 0) {
+						alert("You win!");
+					}
+				} else {
+					targetCell.removeChild(targetCell.lastChild);
+					for (var i = targetCell.stack.length - lastLength - 1; i < targetCell.stack.length - 1; i++) {
+						var cardDiv = document.createElement("div");
+						cardDiv.setAttribute("class", "behind");
+						targetCell.appendChild(cardDiv);
+						var cardImg = document.createElement("img");
+						cardImg.onclick = clickCard;
+						cardImg.setAttribute("src", "images/" + targetCell.stack[i] + ".jpg");
+						cardImg.setAttribute("alt", targetCell.stack[i]);
+						cardDiv.appendChild(cardImg);
+					}
 					var cardImg = document.createElement("img");
 					cardImg.onclick = clickCard;
-					cardImg.setAttribute("src", "images/" + targetCell.stack[i] + ".jpg");
-					cardImg.setAttribute("alt", targetCell.stack[i]);
-					cardDiv.appendChild(cardImg);
+					cardImg.setAttribute("src", "images/" + targetCell.stack[targetCell.stack.length - 1] + ".jpg");
+					cardImg.setAttribute("alt", targetCell.stack[targetCell.stack.length - 1]);
+					targetCell.appendChild(cardImg);
 				}
-				var cardImg = document.createElement("img");
-				cardImg.onclick = clickCard;
-				cardImg.setAttribute("src", "images/" + targetCell.stack[targetCell.stack.length - 1] + ".jpg");
-				cardImg.setAttribute("alt", targetCell.stack[targetCell.stack.length - 1]);
-				targetCell.appendChild(cardImg);
 			} else {
-				lastCard.setAttribute("id", "");
+				lastCard.removeAttribute("id");
 				e.target.setAttribute("id", "selected");
 			}
 		} else {
@@ -191,7 +194,7 @@ function clickCard(e) {
 
 function clickStock(e) {
 	if (document.getElementById("selected")) {
-		document.getElementById("selected").setAttribute("id", "");
+		document.getElementById("selected").removeAttribute("id");
 	}
 	var wasteCell = document.getElementById("wastecell");
 	if (stock.length > 0) {
@@ -219,4 +222,123 @@ function clickStock(e) {
 		e.target.innerHTML = stock.length;
 		wasteCell.removeChild(wasteCell.firstChild);
 	}
+}
+
+function clickBack(e) {
+	if (document.getElementById("selected")) {
+		document.getElementById("selected").removeAttribute("id");
+	}
+	if (e.target.stack.length === 1) {
+		e.target.innerHTML = "";
+		e.target.setAttribute("class", "tableau");
+	} else {
+		e.target.innerHTML = e.target.stack.length - 1;
+	}
+	var cardImg = document.createElement("img");
+	cardImg.onclick = clickCard;
+	cardImg.setAttribute("src", "images/" + e.target.stack[e.target.stack.length - 1] + ".jpg");
+	cardImg.setAttribute("alt", e.target.stack[e.target.stack.length - 1]);
+	e.target.appendChild(cardImg);
+	e.target.removeEventListener("click", clickBack);
+}
+
+function clickTableau(e) {
+	var lastCard = document.getElementById("selected");
+	if (lastCard && parseInt(lastCard.getAttribute("alt")) === 13) {
+		var lastCell = lastCard.parentNode;
+		if (lastCell.getAttribute("class") === "behind") {
+			lastCell = lastCell.parentNode;
+		}
+		var lastStr = lastCard.getAttribute("alt");
+		var lastIndex = lastCell.stack.indexOf(lastStr);
+		var lastLength = lastCell.stack.length - lastIndex;
+		// move card between arrays
+		e.target.stack = e.target.stack.concat(lastCell.stack.splice(lastIndex));
+		// rebuild last cell
+		for (var i = 0; i < lastLength; i++) {
+			lastCell.removeChild(lastCell.lastChild);
+		}
+		if (lastCell.childElementCount > 0
+			|| (lastCell.getAttribute("id") === "wastecell" && lastCell.stack.length > 0)
+			|| (lastCell.getAttribute("class") === "foundation" && lastCell.stack.length > 0)) {
+			if (lastCell.getAttribute("id") !== "wastecell"
+			&& lastCell.getAttribute("class") !== "foundation") {
+				lastCell.removeChild(lastCell.lastChild);
+			}
+			var cardImg = document.createElement("img");
+			cardImg.onclick = clickCard;
+			cardImg.setAttribute("src", "images/" + lastCell.stack[lastCell.stack.length - 1] + ".jpg");
+			cardImg.setAttribute("alt", lastCell.stack[lastCell.stack.length - 1]);
+			lastCell.appendChild(cardImg);
+		} else if (lastCell.getAttribute("class") === "back") {
+			lastCell.addEventListener("click", clickBack);
+		} else if (lastCell.getAttribute("class") === "tableau") {
+			lastCell.addEventListener("click", clickTableau);
+		}
+		// build target cell
+		for (var i = e.target.stack.length - lastLength; i < e.target.stack.length - 1; i++) {
+			var cardDiv = document.createElement("div");
+			cardDiv.setAttribute("class", "behind");
+			e.target.appendChild(cardDiv);
+			var cardImg = document.createElement("img");
+			cardImg.onclick = clickCard;
+			cardImg.setAttribute("src", "images/" + e.target.stack[i] + ".jpg");
+			cardImg.setAttribute("alt", e.target.stack[i]);
+			cardDiv.appendChild(cardImg);
+		}
+		var cardImg = document.createElement("img");
+		cardImg.onclick = clickCard;
+		cardImg.setAttribute("src", "images/" + e.target.stack[e.target.stack.length - 1] + ".jpg");
+		cardImg.setAttribute("alt", e.target.stack[e.target.stack.length - 1]);
+		e.target.appendChild(cardImg);
+		e.target.removeEventListener("click", clickTableau);
+	}
+}
+
+function clickFoundation(e) {
+	var lastCard = document.getElementById("selected");
+	if (lastCard
+		&& parseInt(lastCard.getAttribute("alt")) === 1
+		&& lastCard.parentNode.getAttribute("class") !== "behind")
+	{
+		var lastCell = lastCard.parentNode;
+		// move card between arrays
+		e.target.stack.push(lastCell.stack.pop());
+		// rebuild last cell
+		lastCell.removeChild(lastCell.lastChild);
+		if (lastCell.childElementCount > 0
+			|| (lastCell.getAttribute("id") === "wastecell" && lastCell.stack.length > 0))
+		{
+			if (lastCell.getAttribute("id") !== "wastecell") {
+				lastCell.removeChild(lastCell.lastChild);
+			}
+			var cardImg = document.createElement("img");
+			cardImg.onclick = clickCard;
+			cardImg.setAttribute("src", "images/" + lastCell.stack[lastCell.stack.length - 1] + ".jpg");
+			cardImg.setAttribute("alt", lastCell.stack[lastCell.stack.length - 1]);
+			lastCell.appendChild(cardImg);
+		} else if (lastCell.getAttribute("class") === "back") {
+			lastCell.addEventListener("click", clickBack);
+		} else if (lastCell.getAttribute("class") === "foundation") {
+			lastCell.addEventListener("click", clickFoundation);
+		} else if (lastCell.getAttribute("class") === "tableau") {
+			lastCell.addEventListener("click", clickTableau);
+		}
+		// put moved card onto foundation
+		var cardImg2;
+		if (e.target.hasChildNodes()) {
+			cardImg2 = e.target.firstChild;
+		} else {
+			cardImg2 = document.createElement("img");
+			e.target.appendChild(cardImg2);
+			cardImg2.onclick = clickCard;
+		}
+		cardImg2.setAttribute("src", "images/" + e.target.stack[e.target.stack.length - 1] + ".jpg");
+		cardImg2.setAttribute("alt", e.target.stack[e.target.stack.length - 1]);
+		e.target.removeEventListener("click", clickFoundation);
+	}
+}
+
+function winGame() {
+
 }
