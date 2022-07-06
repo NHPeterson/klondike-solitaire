@@ -109,6 +109,7 @@ function clickCard(e) {
 							((lastSuit === "S" || lastSuit === "C") && (targetSuit === "H" || targetSuit === "D"))
 							|| ((lastSuit === "H" || lastSuit === "D") && (targetSuit === "S" || targetSuit === "C"))
 							)
+						&& (e.target.parentNode.getAttribute("class") != "foundation")
 					)
 					||
 					(
