@@ -95,11 +95,6 @@ function clickCard(e) {
 			var targetStr = e.target.getAttribute("alt");
 			var targetNum = parseInt(targetStr);
 			var targetSuit = targetStr.substr(-1);
-			//if (e.target.getAttribute("alt")) {
-			//	targetStr = e.target.getAttribute("alt");
-			//	targetNum = parseInt(targetStr);
-			//	targetSuit = targetStr.substr(-1);
-			//}
 			if ((e.target.parentNode.getAttribute("id") !== "wastecell")
 				&& (e.target.parentNode.getAttribute("class") !== "behind")
 				&& (
